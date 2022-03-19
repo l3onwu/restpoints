@@ -1,25 +1,26 @@
-import logo from './logo.svg';
-import './App.css';
+import { useEffect } from "react";
+import useLogin from "./helpers/hooks/useLogin";
+import { Box } from "@chakra-ui/react";
+import LoginPage from "./pages/login-page";
+import DashboardPage from "./pages/dashboard-page";
+import { UserContext } from "./helpers/context/contextList";
 
-function App() {
+const App = () => {
+  // State
+  const userHook = useLogin();
+  // Setup
+  useEffect(() => {
+    userHook.setup();
+  }, []);
+  // JSX
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <UserContext.Provider value={{ userHook }}>
+      <Box>
+        {!userHook.user && <LoginPage />}
+        {userHook.user && <DashboardPage />}
+      </Box>
+    </UserContext.Provider>
   );
-}
+};
 
 export default App;
