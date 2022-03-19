@@ -49,7 +49,7 @@ const useCurrentProject = () => {
           setProject(newProjectObject);
           projectsHook.setProjects(newProjectArray);
         } else {
-          alert("Please enter a name to change to");
+          throw Error("Please enter a name to change to");
         }
       } catch (err) {
         alert(err);
