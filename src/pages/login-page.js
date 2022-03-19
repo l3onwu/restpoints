@@ -1,4 +1,5 @@
 import { Box, Stack, Flex, Text, Button } from "@chakra-ui/react";
+import { BsGoogle } from "react-icons/bs";
 import { useUserProvider } from "../helpers/context/contextProviders";
 
 const LoginPage = () => {
@@ -9,7 +10,7 @@ const LoginPage = () => {
     <Box bgColor="gray.800" width="100vw" height="100vh">
       <Flex width="100%" height="100%" pt="calc(100vh * 0.3)" justify="center">
         <Stack direction="column" spacing="30px" color="white">
-          <Stack spacing="10px">
+          <Stack spacing="2px">
             <Text fontSize="30px" fontWeight="bold">
               RESTpoints
             </Text>
@@ -22,7 +23,10 @@ const LoginPage = () => {
             colorScheme="orange"
             onClick={userHook.loginHandler}
           >
-            Login with Google
+            <Flex justify="center" align="center">
+              <Text mr="7px">Login with</Text>
+              <BsGoogle />
+            </Flex>
           </Button>
         </Stack>
       </Flex>
