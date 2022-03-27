@@ -3,6 +3,8 @@ import {
   requestGetProjectData,
   requestDeleteProject,
   requestUpdateProject,
+  requestSwapGroupRank,
+  requestSwapPointsRank,
 } from "../apiClient/firebase-functions";
 import parseEndpoints from "../../services/parse-endpoints";
 
@@ -18,6 +20,12 @@ const useCurrentProject = () => {
     try {
       setLoading(true);
       const [d1, d2] = await requestGetProjectData(project["id"]);
+      d1.sort((a, b) => {
+        return a["rank"] - b["rank"];
+      });
+      d2.sort((a, b) => {
+        return a["rank"] - b["rank"];
+      });
       setEndgroups(d1);
       setEndpoints(d2);
       setLoading(false);
@@ -76,6 +84,67 @@ const useCurrentProject = () => {
     };
     return f;
   };
+  const onDragEndGroups = (result) => {
+    const { source, destination } = result;
+    if (!destination) {
+      return;
+    }
+    if (
+      destination.droppableId === source.droppableId &&
+      destination.index === source.index
+    ) {
+      return;
+    }
+    // Swap ranks
+    const sourceGroup = { ...endgroups[source.index] };
+    const destinationGroup = { ...endgroups[destination.index] };
+    const temp = sourceGroup["rank"];
+    sourceGroup["rank"] = destinationGroup["rank"];
+    destinationGroup["rank"] = temp;
+    const newGroupArray = endgroups.filter((gr, index) => {
+      return index !== source.index;
+    });
+    newGroupArray.splice(destination.index, 0, sourceGroup);
+    setEndgroups(newGroupArray);
+    // requestSwapGroupRank(sourceGroup, destinationGroup).catch((err) =>
+    //   alert(err)
+    // );
+  };
+  const onDragEndPoints = (result) => {
+    const { source, destination } = result;
+    if (!destination) {
+      return;
+    }
+    if (
+      destination.droppableId === source.droppableId &&
+      destination.index === source.index
+    ) {
+      return;
+    }
+    const sourcePoint = {
+      ...parsedEndpoints[Number(source.droppableId)]["endpoints"][source.index],
+    };
+    const destinationPoint = {
+      ...parsedEndpoints[Number(destination.droppableId)]["endpoints"][
+        destination.index
+      ],
+    };
+    // Swap ranks
+    const temp = sourcePoint["rank"];
+    sourcePoint["rank"] = destinationPoint["rank"];
+    destinationPoint["rank"] = temp;
+    const newPointsArray = endpoints.filter((point) => {
+      return point["id"] !== sourcePoint["id"];
+    });
+    const destinationIndex = endpoints.findIndex((point) => {
+      return point["id"] === destinationPoint["id"];
+    });
+    newPointsArray.splice(destinationIndex, 0, sourcePoint);
+    setEndpoints(newPointsArray);
+    // requestSwapPointsRank(sourcePoint, destinationPoint).catch((err) =>
+    //   alert(err)
+    // );
+  };
 
   return {
     project,
@@ -91,6 +160,8 @@ const useCurrentProject = () => {
     updateProjectHandler,
     deleteProjectHandler,
     selectProjectHandler,
+    onDragEndGroups,
+    onDragEndPoints,
   };
 };
 

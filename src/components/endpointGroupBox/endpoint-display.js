@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useProjectsProvider } from "../../helpers/context/contextProviders";
-import { Stack } from "@chakra-ui/react";
+import { Stack, Box } from "@chakra-ui/react";
 import AddressRow from "./address-row";
 import DisplayInputs from "./display-inputs";
 import DisplayDescription from "./display-description";
@@ -9,8 +9,9 @@ import {
   requestDeleteEndpoint,
   requestUpdateEndpoint,
 } from "../../helpers/apiClient/firebase-functions";
+import { Draggable } from "react-beautiful-dnd";
 
-const EndpointDisplay = ({ parsedEndpoint }) => {
+const EndpointDisplay = ({ parsedEndpoint, index }) => {
   // State
   const [isEditing, setIsEditing] = useState(false);
   const address = useField(parsedEndpoint.address);
@@ -37,10 +38,14 @@ const EndpointDisplay = ({ parsedEndpoint }) => {
         const cleanEndpoints = currentProjectHook.endpoints.filter((ep) => {
           return ep["id"] !== parsedEndpoint["id"];
         });
-        currentProjectHook.setEndpoints([
-          ...cleanEndpoints,
-          { ...updateObject, id: parsedEndpoint["id"] },
-        ]);
+        currentProjectHook.setEndpoints(
+          [
+            ...cleanEndpoints,
+            { ...updateObject, id: parsedEndpoint["id"] },
+          ].sort((a, b) => {
+            return a["rank"] - b["rank"];
+          })
+        );
         setIsEditing(!isEditing);
       } catch (err) {
         alert(err);
@@ -60,38 +65,55 @@ const EndpointDisplay = ({ parsedEndpoint }) => {
   };
   // JSX
   return (
-    <Stack
-      bgColor="gray.100"
-      p={5}
-      borderRadius={5}
-      borderWidth="1px"
-      direction="column"
-      spacing={5}
-      fontSize="sm"
-    >
-      {/* HTTP address row */}
-      <AddressRow
-        isEditing={isEditing}
-        editHandler={editingHandler}
-        deleteHandler={deleteHandler}
-        address={address}
-        type={type}
-      />
-      {/* Description */}
-      <DisplayDescription description={description} isEditing={isEditing} />
-      {/* Inputs */}
-      <DisplayInputs
-        objectValues={inputs}
-        isEditing={isEditing}
-        label="Inputs"
-      />
-      {/* Outputs */}
-      <DisplayInputs
-        objectValues={outputs}
-        isEditing={isEditing}
-        label="Outputs"
-      />
-    </Stack>
+    <Draggable draggableId={parsedEndpoint["id"]} index={index}>
+      {(provided) => {
+        return (
+          <Box
+            ref={provided.innerRef}
+            {...provided.draggableProps}
+            {...provided.dragHandleProps}
+            py="8px"
+          >
+            <Stack
+              bgColor="gray.100"
+              p={5}
+              borderRadius={5}
+              borderWidth="1px"
+              direction="column"
+              spacing="9px"
+              // spacing={5}
+              fontSize="sm"
+            >
+              {/* HTTP address row */}
+              <AddressRow
+                isEditing={isEditing}
+                editHandler={editingHandler}
+                deleteHandler={deleteHandler}
+                address={address}
+                type={type}
+              />
+              {/* Description */}
+              <DisplayDescription
+                description={description}
+                isEditing={isEditing}
+              />
+              {/* Inputs */}
+              <DisplayInputs
+                objectValues={inputs}
+                isEditing={isEditing}
+                label="Inputs"
+              />
+              {/* Outputs */}
+              <DisplayInputs
+                objectValues={outputs}
+                isEditing={isEditing}
+                label="Outputs"
+              />
+            </Stack>
+          </Box>
+        );
+      }}
+    </Draggable>
   );
 };
 

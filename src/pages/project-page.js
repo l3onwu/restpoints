@@ -4,6 +4,7 @@ import { Box, Stack, Spinner } from "@chakra-ui/react";
 import Topnav from "../components/topnav/topnav";
 import EndpointForm from "../components/endpointForm/endpoint-form";
 import EndpointGroupBox from "../components/endpointGroupBox/endpoint-group-box";
+import { DragDropContext, Droppable } from "react-beautiful-dnd";
 
 const ProjectPage = () => {
   // State
@@ -32,25 +33,41 @@ const ProjectPage = () => {
           <EndpointForm hiddenForm={hiddenForm} setHiddenForm={setHiddenForm} />
         </Box>
         {/* Right Display */}
-        <Stack
-          direction="row"
-          height="calc(100vh - 45px)"
-          pl={hiddenForm ? "100px" : "340px"}
-          pt="20px"
-          pr="100px"
-          spacing="30px"
-        >
-          {currentProjectHook["loading"] && <Spinner mt="20px" ml="50px" />}
-          {!currentProjectHook["loading"] &&
-            currentProjectHook.parsedEndpoints.map((parsedGroup) => {
+        <DragDropContext onDragEnd={currentProjectHook.onDragEndGroups}>
+          <Droppable direction="horizontal" droppableId="1">
+            {(provided) => {
               return (
-                <EndpointGroupBox
-                  key={parsedGroup["id"]}
-                  parsedGroup={parsedGroup}
-                />
+                <Stack
+                  {...provided.droppableProps}
+                  ref={provided.innerRef}
+                  direction="row"
+                  height="calc(100vh - 45px)"
+                  pl={hiddenForm ? "100px" : "340px"}
+                  pt="20px"
+                  pr="100px"
+                  spacing="0px"
+                >
+                  {currentProjectHook["loading"] && (
+                    <Spinner mt="20px" ml="50px" />
+                  )}
+                  {!currentProjectHook["loading"] &&
+                    currentProjectHook.parsedEndpoints.map(
+                      (parsedGroup, index) => {
+                        return (
+                          <EndpointGroupBox
+                            key={parsedGroup["id"]}
+                            index={index}
+                            parsedGroup={parsedGroup}
+                          />
+                        );
+                      }
+                    )}
+                  {provided.placeholder}
+                </Stack>
               );
-            })}
-        </Stack>
+            }}
+          </Droppable>
+        </DragDropContext>
       </Stack>
     </Box>
   );

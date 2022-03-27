@@ -114,3 +114,18 @@ export const requestUpdateGroup = async (id, updateObject) => {
   const docRef = await db.collection("groups").doc(id);
   docRef.update(updateObject);
 };
+
+// TODO: Implement new data structure, 'rank array'
+export const requestSwapGroupRank = async (group1, group2) => {
+  const docRef1 = await db.collection("groups").doc(group1["id"]);
+  await docRef1.update(group1);
+  const docRef2 = await db.collection("groups").doc(group2["id"]);
+  await docRef2.update(group2);
+};
+
+export const requestSwapPointsRank = async (point1, point2) => {
+  const docRef1 = await db.collection("endpoints").doc(point1["id"]);
+  docRef1.update(point1);
+  const docRef2 = await db.collection("endpoints").doc(point2["id"]);
+  docRef2.update(point2);
+};
