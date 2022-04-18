@@ -10,10 +10,12 @@ const ProjectPage = () => {
   // State
   const { currentProjectHook } = useProjectsProvider();
   const [hiddenForm, setHiddenForm] = useState(false);
+
   // Setup
   useEffect(() => {
     currentProjectHook.setup();
-  }, [currentProjectHook.project]);
+  }, [currentProjectHook.project.name]);
+
   // JSX
   return (
     <Box bgColor="gray.600" width="100vw" height="100vh">
@@ -51,13 +53,13 @@ const ProjectPage = () => {
                     <Spinner mt="20px" ml="50px" />
                   )}
                   {!currentProjectHook["loading"] &&
-                    currentProjectHook.parsedEndpoints.map(
-                      (parsedGroup, index) => {
+                    currentProjectHook.groupOrder.map(
+                      (groupID, index) => {
                         return (
                           <EndpointGroupBox
-                            key={parsedGroup["id"]}
+                            key={groupID}
                             index={index}
-                            parsedGroup={parsedGroup}
+                            parsedGroup={currentProjectHook["pe2"][groupID]}
                           />
                         );
                       }

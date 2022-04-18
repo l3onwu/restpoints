@@ -9,6 +9,7 @@ const EndpointGroupBox = ({ parsedGroup, index }) => {
   // State
   const { currentProjectHook } = useProjectsProvider();
   const editGroupHook = useEditGroup(parsedGroup, currentProjectHook);
+
   // JSX
   return (
     <Draggable draggableId={parsedGroup["name"]} index={index}>
@@ -68,15 +69,19 @@ const EndpointGroupBox = ({ parsedGroup, index }) => {
                         direction="column"
                         spacing="0px"
                       >
-                        {parsedGroup.endpoints.map((parsedEndpoint, index) => {
-                          return (
-                            <EndpointDisplay
-                              key={parsedEndpoint["id"]}
-                              index={index}
-                              parsedEndpoint={parsedEndpoint}
-                            />
-                          );
-                        })}
+                        {currentProjectHook.pointOrder[parsedGroup["id"]]?.map(
+                          (pointID, index) => {
+                            return (
+                              <EndpointDisplay
+                                key={pointID}
+                                index={index}
+                                parsedEndpoint={
+                                  parsedGroup["endpoints"][pointID]
+                                }
+                              />
+                            );
+                          }
+                        )}
                         {provided.placeholder}
                       </Stack>
                     );

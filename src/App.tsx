@@ -4,14 +4,17 @@ import { Box } from "@chakra-ui/react";
 import LoginPage from "./pages/login-page";
 import DashboardPage from "./pages/dashboard-page";
 import { UserContext } from "./helpers/context/contextList";
+import { UserHook } from "./types/shared";
 
 const App = () => {
   // State
-  const userHook = useLogin();
+  const userHook: UserHook = useLogin();
+
   // Setup
   useEffect(() => {
     userHook.setup();
   }, []);
+
   // JSX
   return (
     <UserContext.Provider value={{ userHook }}>

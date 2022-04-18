@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, FC } from "react";
 import { useProjectsProvider } from "../../helpers/context/contextProviders";
 import { Stack, Box } from "@chakra-ui/react";
 import AddressRow from "./address-row";
@@ -8,10 +8,18 @@ import { useField, useJSONField } from "../../helpers/hooks/useField";
 import {
   requestDeleteEndpoint,
   requestUpdateEndpoint,
+  requestGroupOrder,
 } from "../../helpers/apiClient/firebase-functions";
 import { Draggable } from "react-beautiful-dnd";
+import { ParsedEndpointType } from "../../types/shared";
 
-const EndpointDisplay = ({ parsedEndpoint, index }) => {
+// Types
+interface PropType {
+  parsedEndpoint: ParsedEndpointType;
+  index: number;
+}
+
+const EndpointDisplay: FC<PropType> = ({ parsedEndpoint, index }) => {
   // State
   const [isEditing, setIsEditing] = useState(false);
   const address = useField(parsedEndpoint.address);
@@ -20,6 +28,7 @@ const EndpointDisplay = ({ parsedEndpoint, index }) => {
   const inputs = useJSONField(parsedEndpoint.inputs);
   const outputs = useJSONField(parsedEndpoint.outputs);
   const { currentProjectHook } = useProjectsProvider();
+
   // Functions
   const editingHandler = async () => {
     if (!isEditing) {
@@ -38,14 +47,10 @@ const EndpointDisplay = ({ parsedEndpoint, index }) => {
         const cleanEndpoints = currentProjectHook.endpoints.filter((ep) => {
           return ep["id"] !== parsedEndpoint["id"];
         });
-        currentProjectHook.setEndpoints(
-          [
-            ...cleanEndpoints,
-            { ...updateObject, id: parsedEndpoint["id"] },
-          ].sort((a, b) => {
-            return a["rank"] - b["rank"];
-          })
-        );
+        currentProjectHook.setEndpoints([
+          ...cleanEndpoints,
+          { ...updateObject, id: parsedEndpoint["id"] },
+        ]);
         setIsEditing(!isEditing);
       } catch (err) {
         alert(err);
@@ -54,6 +59,23 @@ const EndpointDisplay = ({ parsedEndpoint, index }) => {
   };
   const deleteHandler = async () => {
     try {
+      // Delete from project order
+      const updateOrder = currentProjectHook["pointOrder"];
+      updateOrder[parsedEndpoint.groupID] = updateOrder[
+        parsedEndpoint.groupID
+      ].filter((id) => {
+        return id !== parsedEndpoint.id;
+      });
+
+      // Update db
+      await requestGroupOrder(
+        parsedEndpoint["groupID"],
+        updateOrder[parsedEndpoint.groupID]
+      );
+
+      // Update order locally
+      currentProjectHook.setPointOrder(updateOrder);
+
       await requestDeleteEndpoint(parsedEndpoint.id);
       const cleanEndpoints = currentProjectHook.endpoints.filter((ep) => {
         return ep["id"] !== parsedEndpoint["id"];

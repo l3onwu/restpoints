@@ -4,7 +4,10 @@ export const validateInputs = (group, type, address) => {
   }
 };
 
-export const validateJSON = (inputs, outputs) => {
+export const validateJSON = (
+  inputs: string,
+  outputs: string
+): Array<object> => {
   try {
     return [JSON.parse(inputs), JSON.parse(outputs)];
   } catch (err) {

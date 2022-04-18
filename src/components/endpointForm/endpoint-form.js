@@ -21,6 +21,7 @@ const EndpointForm = ({ hiddenForm, setHiddenForm }) => {
   const { userHook } = useUserProvider();
   const { currentProjectHook } = useProjectsProvider();
   const form = useForm();
+
   // Functions
   const dataHandler = (callback) => {
     const func = (e) => {
@@ -28,6 +29,7 @@ const EndpointForm = ({ hiddenForm, setHiddenForm }) => {
     };
     return func;
   };
+
   // JSX
   return (
     <>

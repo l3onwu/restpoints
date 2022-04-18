@@ -5,6 +5,7 @@ import { useUserProvider } from "../helpers/context/contextProviders";
 const LoginPage = () => {
   // State
   const { userHook } = useUserProvider();
+
   // JSX
   return (
     <Box bgColor="gray.800" width="100vw" height="100vh">
