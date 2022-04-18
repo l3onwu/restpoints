@@ -7,14 +7,14 @@ import {
   requestProjectOrder,
 } from "../apiClient/firebase-functions";
 import { parseEndpointsObject } from "../../services/parse-endpoints";
-import { ProjectType, EndgroupType, EndpointType } from "../../types/shared";
+import { ProjectType, EndgroupType } from "../../types/shared";
 
 const useCurrentProject = () => {
   // State
   const [project, setProject] = useState<ProjectType | Boolean>(false);
   const [loading, setLoading] = useState<Boolean>(false);
   const [endgroups, setEndgroups] = useState<Array<EndgroupType>>([]);
-  const [endpoints, setEndpoints] = useState<Array<EndpointType>>([]);
+  const [endpoints, setEndpoints] = useState([]);
 
   // Parsed
   const [groupOrder, setGroupOrder] = useState([]);
